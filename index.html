@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Riverside — School Management System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #F2EFE6;
+    --paper-line: #DCD6C4;
+    --ink: #1E2A44;
+    --ink-soft: #4B5670;
+    --navy: #1E2A44;
+    --navy-deep: #141D30;
+    --gold: #B8862E;
+    --gold-soft: #E8D9B5;
+    --red: #A23B33;
+    --red-soft: #F1DCD9;
+    --green: #3E6259;
+    --green-soft: #DCE8E4;
+    --card: #FBFAF6;
+    --shadow: rgba(30, 42, 68, 0.10);
+    --radius: 3px;
+  }
+  :root[data-theme="dark"] {
+    --paper: #171A1F;
+    --paper-line: #2B2F38;
+    --ink: #E7E4DA;
+    --ink-soft: #A9AFBE;
+    --navy: #C9CEDC;
+    --navy-deep: #0E1116;
+    --gold: #D9AE5C;
+    --gold-soft: #3A331F;
+    --red: #D97C71;
+    --red-soft: #3A2422;
+    --green: #7FB3A3;
+    --green-soft: #1F2E29;
+    --card: #1D2128;
+    --shadow: rgba(0, 0, 0, 0.35);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #171A1F;
+      --paper-line: #2B2F38;
+      --ink: #E7E4DA;
+      --ink-soft: #A9AFBE;
+      --navy: #C9CEDC;
+      --navy-deep: #0E1116;
+      --gold: #D9AE5C;
+      --gold-soft: #3A331F;
+      --red: #D97C71;
+      --red-soft: #3A2422;
+      --green: #7FB3A3;
+      --green-soft: #1F2E29;
+      --card: #1D2128;
+      --shadow: rgba(0, 0, 0, 0.35);
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Inter', -apple-system, sans-serif;
+    min-height: 100vh;
+  }
+
+  .app { display: flex; min-height: 100vh; }
+
+  /* ---------- SIDEBAR ---------- */
+  .sidebar {
+    width: 230px;
+    flex-shrink: 0;
+    background: var(--navy-deep);
+    color: #E7E4DA;
+    padding: 28px 0 20px;
+    display: flex;
+    flex-direction: column;
+  }
+  .brand {
+    font-family: 'Lora', serif;
+    font-weight: 600;
+    font-size: 1.28rem;
+    padding: 0 22px 22px;
+    border-bottom: 1px solid rgba(255,255,255,0.12);
+    margin-bottom: 6px;
+    line-height: 1.25;
+  }
+  .brand span { display: block; font-size: 0.68rem; font-family: 'Inter'; font-weight: 500; color: #A9AFBE; letter-spacing: 0.02em; margin-top: 4px; }
+
+  nav { flex: 1; margin-top: 10px; }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 11px 22px;
+    font-size: 0.92rem;
+    color: #C7CBD6;
+    cursor: pointer;
+    border-left: 3px solid transparent;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+  }
+  .nav-item:hover { background: rgba(255,255,255,0.05); color: #fff; }
+  .nav-item.active {
+    background: rgba(184, 134, 46, 0.14);
+    color: #fff;
+    border-left-color: var(--gold);
+    font-weight: 600;
+  }
+  .nav-item .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; opacity: 0.55; }
+
+  .sidebar-foot {
+    padding: 14px 22px 0;
+    font-size: 0.72rem;
+    color: #6F7688;
+    border-top: 1px solid rgba(255,255,255,0.10);
+    margin-top: 12px;
+  }
+
+  /* ---------- MAIN ---------- */
+  main { flex: 1; min-width: 0; padding: 34px 40px 60px; }
+
+  .page-head { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 22px; flex-wrap: wrap; gap: 14px; }
+  .page-head h1 { font-family: 'Lora', serif; font-weight: 600; font-size: 1.6rem; margin: 0 0 4px; color: var(--navy); }
+  .page-head p { margin: 0; color: var(--ink-soft); font-size: 0.9rem; }
+
+  .btn {
+    font-family: 'Inter'; font-weight: 600; font-size: 0.86rem;
+    border: none; border-radius: var(--radius);
+    padding: 9px 16px; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 7px;
+    transition: filter 0.15s, transform 0.1s;
+  }
+  .btn:active { transform: translateY(1px); }
+  .btn-primary { background: var(--navy); color: #fff; }
+  .btn-primary:hover { filter: brightness(1.15); }
+  .btn-gold { background: var(--gold); color: #2A2110; }
+  .btn-gold:hover { filter: brightness(1.08); }
+  .btn-ghost { background: transparent; color: var(--ink-soft); border: 1px solid var(--paper-line); }
+  .btn-ghost:hover { border-color: var(--ink-soft); color: var(--ink); }
+  .btn-sm { padding: 5px 10px; font-size: 0.78rem; }
+  .btn-danger-text { background: none; border: none; color: var(--red); font-weight: 600; font-size: 0.8rem; cursor: pointer; padding: 4px 6px; }
+  .btn-danger-text:hover { text-decoration: underline; }
+  .btn-edit-text { background: none; border: none; color: var(--navy); font-weight: 600; font-size: 0.8rem; cursor: pointer; padding: 4px 6px; }
+  .btn-edit-text:hover { text-decoration: underline; }
+
+  /* Dashboard stat cards */
+  .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 30px; }
+  .stat-card {
+    background: var(--card); border: 1px solid var(--paper-line);
+    border-radius: var(--radius); padding: 18px 20px;
+    border-left: 3px solid var(--gold);
+  }
+  .stat-card .num { font-family: 'Lora', serif; font-size: 1.9rem; font-weight: 700; color: var(--navy); line-height: 1; }
+  .stat-card .lbl { font-size: 0.8rem; color: var(--ink-soft); margin-top: 6px; }
+
+  .panel { background: var(--card); border: 1px solid var(--paper-line); border-radius: var(--radius); padding: 22px 24px; margin-bottom: 22px; }
+  .panel h2 { font-family: 'Lora', serif; font-size: 1.05rem; margin: 0 0 14px; color: var(--navy); font-weight: 600; }
+
+  /* Toolbar */
+  .toolbar { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; justify-content: space-between; }
+  .toolbar-left { display: flex; gap: 10px; flex-wrap: wrap; }
+  input[type=text], input[type=search], input[type=date], input[type=number], input[type=email], input[type=tel], select {
+    font-family: 'Inter'; font-size: 0.87rem;
+    padding: 8px 11px; border: 1px solid var(--paper-line); border-radius: var(--radius);
+    background: var(--paper); color: var(--ink);
+  }
+  input:focus, select:focus { outline: 2px solid var(--gold); outline-offset: 1px; border-color: var(--gold); }
+  .search-box { min-width: 220px; }
+
+  /* Table = ledger */
+  table { width: 100%; border-collapse: collapse; font-size: 0.87rem; }
+  thead th {
+    text-align: left; font-weight: 600; color: var(--ink-soft);
+    font-size: 0.74rem; letter-spacing: 0.03em;
+    padding: 8px 10px; border-bottom: 2px solid var(--navy);
+  }
+  tbody td { padding: 10px 10px; border-bottom: 1px solid var(--paper-line); color: var(--ink); }
+  tbody tr:nth-child(even) { background: rgba(184, 134, 46, 0.045); }
+  tbody tr:hover { background: rgba(184, 134, 46, 0.09); }
+  .table-wrap { overflow-x: auto; }
+  .empty-row td { text-align: center; color: var(--ink-soft); padding: 30px 10px; font-style: italic; }
+
+  .badge { display: inline-block; padding: 3px 9px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; }
+  .badge-paid { background: var(--green-soft); color: var(--green); }
+  .badge-due { background: var(--red-soft); color: var(--red); }
+  .badge-present { background: var(--green-soft); color: var(--green); }
+  .badge-absent { background: var(--red-soft); color: var(--red); }
+
+  /* Modal / form */
+  .overlay {
+    position: fixed; inset: 0; background: rgba(20, 29, 48, 0.55);
+    display: none; align-items: center; justify-content: center; z-index: 100; padding: 20px;
+  }
+  .overlay.show { display: flex; }
+  .modal {
+    background: var(--card); border-radius: var(--radius);
+    width: 100%; max-width: 460px; max-height: 88vh; overflow-y: auto;
+    padding: 26px 28px; box-shadow: 0 12px 40px var(--shadow);
+    border-top: 4px solid var(--gold);
+  }
+  .modal h3 { font-family: 'Lora', serif; margin: 0 0 18px; color: var(--navy); font-size: 1.15rem; }
+  .field { margin-bottom: 14px; }
+  .field label { display: block; font-size: 0.8rem; font-weight: 600; color: var(--ink-soft); margin-bottom: 5px; }
+  .field input, .field select { width: 100%; }
+  .field .err { color: var(--red); font-size: 0.76rem; margin-top: 4px; display: none; }
+  .field.invalid input, .field.invalid select { border-color: var(--red); }
+  .field.invalid .err { display: block; }
+  .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+
+  .toast {
+    position: fixed; bottom: 24px; right: 24px; z-index: 200;
+    background: var(--navy); color: #fff; padding: 12px 18px;
+    border-radius: var(--radius); font-size: 0.86rem; font-weight: 500;
+    box-shadow: 0 8px 24px var(--shadow); border-left: 3px solid var(--gold);
+    opacity: 0; transform: translateY(10px); transition: opacity 0.2s, transform 0.2s;
+    pointer-events: none;
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+
+  .attendance-list { display: flex; flex-direction: column; gap: 8px; margin-top: 14px; }
+  .att-row { display: flex; justify-content: space-between; align-items: center; padding: 9px 12px; background: var(--paper); border-radius: var(--radius); border: 1px solid var(--paper-line); }
+  .att-row .name { font-weight: 500; }
+  .att-toggle { display: flex; gap: 6px; }
+  .att-toggle button {
+    border: 1px solid var(--paper-line); background: var(--card); color: var(--ink-soft);
+    font-size: 0.76rem; font-weight: 600; padding: 5px 12px; border-radius: 20px; cursor: pointer;
+  }
+  .att-toggle button.on-present { background: var(--green-soft); color: var(--green); border-color: var(--green); }
+  .att-toggle button.on-absent { background: var(--red-soft); color: var(--red); border-color: var(--red); }
+
+  .hint { font-size: 0.82rem; color: var(--ink-soft); }
+
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-thumb { background: var(--paper-line); border-radius: 6px; }
+
+  @media (max-width: 760px) {
+    .app { flex-direction: column; }
+    .sidebar { width: 100%; flex-direction: row; overflow-x: auto; padding: 14px 0; align-items: center; }
+    .brand { display: none; }
+    nav { display: flex; margin: 0; }
+    .nav-item { border-left: none; border-bottom: 3px solid transparent; white-space: nowrap; padding: 8px 14px; }
+    .nav-item.active { border-left: none; border-bottom-color: var(--gold); }
+    .sidebar-foot { display: none; }
+    main { padding: 22px 16px 50px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">Riverside<span>School Management System</span></div>
+    <nav id="nav"></nav>
+    <div class="sidebar-foot">Data is stored locally in this browser.</div>
+  </aside>
+
+  <main>
+    <div id="view"></div>
+  </main>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="modal" id="modal"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function () {
+  "use strict";
+
+  // ---------------------------------------------------------------
+  // STATE
+  // ---------------------------------------------------------------
+  const STORE_KEY = "riverside_sms_v1";
+  const defaultData = {
+    students: [
+      { id: genId(), name: "Ayaan Kapoor", roll: "S-1001", cls: "Grade 8 - A", email: "ayaan.k@example.com", phone: "9876500001", guardian: "R. Kapoor" },
+      { id: genId(), name: "Meera Iyer", roll: "S-1002", cls: "Grade 8 - A", email: "meera.i@example.com", phone: "9876500002", guardian: "S. Iyer" },
+      { id: genId(), name: "Devon Clarke", roll: "S-1003", cls: "Grade 9 - B", email: "devon.c@example.com", phone: "9876500003", guardian: "L. Clarke" }
+    ],
+    teachers: [
+      { id: genId(), name: "Priya Nathan", subject: "Mathematics", email: "p.nathan@example.com", phone: "9876511001" },
+      { id: genId(), name: "James Okafor", subject: "English", email: "j.okafor@example.com", phone: "9876511002" }
+    ],
+    classes: [
+      { id: genId(), name: "Grade 8 - A", teacherId: null, room: "Room 12", capacity: 30 },
+      { id: genId(), name: "Grade 9 - B", teacherId: null, room: "Room 4", capacity: 28 }
+    ],
+    attendance: {}, // { "className|date": { studentId: "present"|"absent" } }
+    fees: [
+      { id: genId(), studentId: null, amount: 4500, status: "due", date: todayStr(), note: "Term 2 tuition" }
+    ]
+  };
+  // wire up default teacher/student references now that ids exist
+  defaultData.classes[0].teacherId = defaultData.teachers[0].id;
+  defaultData.classes[1].teacherId = defaultData.teachers[1].id;
+  defaultData.fees[0].studentId = defaultData.students[0].id;
+
+  let data = loadData();
+
+  function genId() { return 'id_' + Math.random().toString(36).slice(2, 10) + Date.now().toString(36); }
+  function todayStr() { const d = new Date(); return d.toISOString().slice(0, 10); }
+
+  function loadData() {
+    try {
+      const raw = localStorage.getItem(STORE_KEY);
+      if (raw) return JSON.parse(raw);
+    } catch (e) { console.warn("Could not load saved data, starting fresh.", e); }
+    return JSON.parse(JSON.stringify(defaultData));
+  }
+  function saveData() {
+    try { localStorage.setItem(STORE_KEY, JSON.stringify(data)); }
+    catch (e) { console.warn("Could not save data.", e); showToast("Couldn't save — storage may be full or blocked."); }
+  }
+
+  // ---------------------------------------------------------------
+  // NAV / ROUTING
+  // ---------------------------------------------------------------
+  const routes = [
+    { key: "dashboard", label: "Dashboard" },
+    { key: "students", label: "Students" },
+    { key: "teachers", label: "Teachers" },
+    { key: "classes", label: "Classes" },
+    { key: "attendance", label: "Attendance" },
+    { key: "fees", label: "Fees" }
+  ];
+  let current = "dashboard";
+
+  function renderNav() {
+    const nav = document.getElementById("nav");
+    nav.innerHTML = "";
+    routes.forEach(r => {
+      const el = document.createElement("div");
+      el.className = "nav-item" + (r.key === current ? " active" : "");
+      el.innerHTML = `<span class="dot"></span>${r.label}`;
+      el.onclick = () => { current = r.key; render(); };
+      nav.appendChild(el);
+    });
+  }
+
+  function render() {
+    renderNav();
+    const view = document.getElementById("view");
+    view.innerHTML = "";
+    if (current === "dashboard") view.appendChild(renderDashboard());
+    if (current === "students") view.appendChild(renderStudents());
+    if (current === "teachers") view.appendChild(renderTeachers());
+    if (current === "classes") view.appendChild(renderClasses());
+    if (current === "attendance") view.appendChild(renderAttendance());
+    if (current === "fees") view.appendChild(renderFees());
+  }
+
+  function el(tag, cls, html) {
+    const e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (html !== undefined) e.innerHTML = html;
+    return e;
+  }
+
+  function pageHead(title, sub, actionsHtml) {
+    const head = el("div", "page-head");
+    head.innerHTML = `
+      <div><h1>${title}</h1><p>${sub}</p></div>
+      <div>${actionsHtml || ""}</div>`;
+    return head;
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById("toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    clearTimeout(showToast._timer);
+    showToast._timer = setTimeout(() => t.classList.remove("show"), 2200);
+  }
+
+  function closeModal() {
+    document.getElementById("overlay").classList.remove("show");
+    document.getElementById("modal").innerHTML = "";
+  }
+  function openModal(html) {
+    document.getElementById("modal").innerHTML = html;
+    document.getElementById("overlay").classList.add("show");
+  }
+  document.getElementById("overlay").addEventListener("click", (e) => {
+    if (e.target.id === "overlay") closeModal();
+  });
+
+  function validEmail(v) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
+
+  // ---------------------------------------------------------------
+  // DASHBOARD
+  // ---------------------------------------------------------------
+  function renderDashboard() {
+    const wrap = el("div");
+    wrap.appendChild(pageHead("Dashboard", "An overview of the school right now."));
+
+    const stats = el("div", "stat-grid");
+    const dueFees = data.fees.filter(f => f.status === "due").length;
+    [
+      { num: data.students.length, lbl: "Students enrolled" },
+      { num: data.teachers.length, lbl: "Teachers on staff" },
+      { num: data.classes.length, lbl: "Classes running" },
+      { num: dueFees, lbl: "Fee payments due" }
+    ].forEach(s => {
+      const c = el("div", "stat-card", `<div class="num">${s.num}</div><div class="lbl">${s.lbl}</div>`);
+      stats.appendChild(c);
+    });
+    wrap.appendChild(stats);
+
+    const panel = el("div", "panel");
+    panel.innerHTML = `<h2>Recently added students</h2>`;
+    const list = data.students.slice(-5).reverse();
+    const tw = el("div", "table-wrap");
+    const table = el("table");
+    table.innerHTML = `<thead><tr><th>Name</th><th>Roll No.</th><th>Class</th></tr></thead>`;
+    const tbody = el("tbody");
+    if (list.length === 0) {
+      tbody.innerHTML = `<tr class="empty-row"><td colspan="3">No students yet — add one from the Students tab.</td></tr>`;
+    } else {
+      list.forEach(s => {
+        tbody.appendChild(el("tr", "", `<td>${escapeHtml(s.name)}</td><td>${escapeHtml(s.roll)}</td><td>${escapeHtml(s.cls || "—")}</td>`));
+      });
+    }
+    table.appendChild(tbody);
+    tw.appendChild(table);
+    panel.appendChild(tw);
+    wrap.appendChild(panel);
+
+    return wrap;
+  }
+
+  function escapeHtml(str) {
+    if (str === undefined || str === null) return "";
+    return String(str).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  }
+
+  // ---------------------------------------------------------------
+  // STUDENTS
+  // ---------------------------------------------------------------
+  let studentSearch = "";
+
+  function renderStudents() {
+    const wrap = el("div");
+    wrap.appendChild(pageHead("Students", "Manage student records.", `<button class="btn btn-gold" id="addStudentBtn">+ Add student</button>`));
+
+    const panel = el("div", "panel");
+    const toolbar = el("div", "toolbar");
+    toolbar.innerHTML = `
+      <div class="toolbar-left">
+        <input type="search" class="search-box" id="studentSearch" placeholder="Search by name, roll no., or class" value="${escapeHtml(studentSearch)}">
+      </div>
+      <div class="hint">${data.students.length} total</div>`;
+    panel.appendChild(toolbar);
+
+    const filtered = data.students.filter(s => {
+      const q = studentSearch.toLowerCase();
+      return !q || s.name.toLowerCase().includes(q) || s.roll.toLowerCase().includes(q) || (s.cls || "").toLowerCase().includes(q);
+    });
+
+    const tw = el("div", "table-wrap");
+    const table = el("table");
+    table.innerHTML = `<thead><tr><th>Name</th><th>Roll No.</th><th>Class</th><th>Email</th><th>Guardian</th><th></th></tr></thead>`;
+    const tbody = el("tbody");
+    if (filtered.length === 0) {
+      tbody.innerHTML = `<tr class="empty-row"><td colspan="6">No matching students.</td></tr>`;
+    } else {
+      filtered.forEach(s => {
+        const tr = el("tr");
+        tr.innerHTML = `
+          <td>${escapeHtml(s.name)}</td>
+          <td>${escapeHtml(s.roll)}</td>
+          <td>${escapeHtml(s.cls || "—")}</td>
+          <td>${escapeHtml(s.email || "—")}</td>
+          <td>${escapeHtml(s.guardian || "—")}</td>
+          <td style="white-space:nowrap;">
+            <button class="btn-edit-text" data-edit="${s.id}">Edit</button>
+            <button class="btn-danger-text" data-del="${s.id}">Delete</button>
+          </td>`;
+        tbody.appendChild(tr);
+      });
+    }
+    table.appendChild(tbody);
+    tw.appendChild(table);
+    panel.appendChild(tw);
+    wrap.appendChild(panel);
+
+    setTimeout(() => {
+      document.getElementById("addStudentBtn").onclick = () => openStudentForm();
+      document.getElementById("studentSearch").oninput = (e) => { studentSearch = e.target.value; render(); };
+      wrap.querySelectorAll("[data-edit]").forEach(b => b.onclick = () => openStudentForm(b.dataset.edit));
+      wrap.querySelectorAll("[data-del]").forEach(b => b.onclick = () => deleteStudent(b.dataset.del));
+    }, 0);
+
+    return wrap;
+  }
+
+  function openStudentForm(id) {
+    const existing = id ? data.students.find(s => s.id === id) : null;
+    const classOptions = data.classes.map(c => `<option value="${escapeHtml(c.name)}" ${existing && existing.cls === c.name ? "selected" : ""}>${escapeHtml(c.name)}</option>`).join("");
+    openModal(`
+      <h3>${existing ? "Edit student" : "Add student"}</h3>
+      <form id="studentForm" novalidate>
+        <div class="field" data-f="name"><label>Full name *</label><input type="text" name="name" value="${escapeHtml(existing?.name)}"><div class="err">Name is required.</div></div>
+        <div class="field" data-f="roll"><label>Roll number *</label><input type="text" name="roll" value="${escapeHtml(existing?.roll)}"><div class="err">Roll number is required and must be unique.</div></div>
+        <div class="field" data-f="cls"><label>Class</label>
+          <select name="cls"><option value="">— None —</option>${classOptions}</select>
+        </div>
+        <div class="field" data-f="email"><label>Email</label><input type="email" name="email" value="${escapeHtml(existing?.email)}"><div class="err">Enter a valid email address.</div></div>
+        <div class="field" data-f="phone"><label>Phone</label><input type="tel" name="phone" value="${escapeHtml(existing?.phone)}"></div>
+        <div class="field" data-f="guardian"><label>Guardian name</label><input type="text" name="guardian" value="${escapeHtml(existing?.guardian)}"></div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-ghost" id="cancelBtn">Cancel</button>
+          <button type="submit" class="btn btn-primary">${existing ? "Save changes" : "Add student"}</button>
+        </div>
+      </form>
+    `);
+    document.getElementById("cancelBtn").onclick = closeModal;
+    document.getElementById("studentForm").onsubmit = (e) => {
+      e.preventDefault();
+      const f = e.target;
+      const name = f.name.value.trim();
+      const roll = f.roll.value.trim();
+      const email = f.email.value.trim();
+      let ok = true;
+      clearErrors(f);
+      if (!name) { markInvalid(f, "name"); ok = false; }
+      if (!roll) { markInvalid(f, "roll"); ok = false; }
+      const dup = data.students.find(s => s.roll.toLowerCase() === roll.toLowerCase() && (!existing || s.id !== existing.id));
+      if (roll && dup) { markInvalid(f, "roll"); ok = false; }
+      if (email && !validEmail(email)) { markInvalid(f, "email"); ok = false; }
+      if (!ok) return;
+
+      const record = {
+        id: existing ? existing.id : genId(),
+        name, roll, cls: f.cls.value, email, phone: f.phone.value.trim(), guardian: f.guardian.value.trim()
+      };
+      if (existing) {
+        Object.assign(existing, record);
+        showToast("Student updated.");
+      } else {
+        data.students.push(record);
+        showToast("Student added.");
+      }
+      saveData();
+      closeModal();
+      render();
+    };
+  }
+
+  function markInvalid(form, fieldName) {
+    const field = form.querySelector(`[data-f="${fieldName}"]`);
+    if (field) field.classList.add("invalid");
+  }
+  function clearErrors(form) {
+    form.querySelectorAll(".field").forEach(f => f.classList.remove("invalid"));
+  }
+
+  function deleteStudent(id) {
+    const s = data.students.find(x => x.id === id);
+    if (!s) return;
+    if (!confirm(`Delete ${s.name}? This also removes their fee and attendance records.`)) return;
+    data.students = data.students.filter(x => x.id !== id);
+    data.fees = data.fees.filter(f => f.studentId !== id);
+    Object.values(data.attendance).forEach(rec => { delete rec[id]; });
+    saveData();
+    showToast("Student deleted.");
+    render();
+  }
+
+  // ---------------------------------------------------------------
+  // TEACHERS
+  // ---------------------------------------------------------------
+  let teacherSearch = "";
+
+  function renderTeachers() {
+    const wrap = el("div");
+    wrap.appendChild(pageHead("Teachers", "Manage teaching staff.", `<button class="btn btn-gold" id="addTeacherBtn">+ Add teacher</button>`));
+
+    const panel = el("div", "panel");
+    const toolbar = el("div", "toolbar");
+    toolbar.innerHTML = `
+      <div class="toolbar-left"><input type="search" class="search-box" id="teacherSearch" placeholder="Search by name or subject" value="${escapeHtml(teacherSearch)}"></div>
+      <div class="hint">${data.teachers.length} total</div>`;
+    panel.appendChild(toolbar);
+
+    const filtered = data.teachers.filter(t => {
+      const q = teacherSearch.toLowerCase();
+      return !q || t.name.toLowerCase().includes(q) || t.subject.toLowerCase().includes(q);
+    });
+
+    const tw = el("div", "table-wrap");
+    const table = el("table");
+    table.innerHTML = `<thead><tr><th>Name</th><th>Subject</th><th>Email</th><th>Phone</th><th></th></tr></thead>`;
+    const tbody = el("tbody");
+    if (filtered.length === 0) {
+      tbody.innerHTML = `<tr class="empty-row"><td colspan="5">No matching teachers.</td></tr>`;
+    } else {
+      filtered.forEach(t => {
+        const tr = el("tr");
+        tr.innerHTML = `
+          <td>${escapeHtml(t.name)}</td><td>${escapeHtml(t.subject)}</td>
+          <td>${escapeHtml(t.email || "—")}</td><td>${escapeHtml(t.phone || "—")}</td>
+          <td style="white-space:nowrap;">
+            <button class="btn-edit-text" data-edit="${t.id}">Edit</button>
+            <button class="btn-danger-text" data-del="${t.id}">Delete</button>
+          </td>`;
+        tbody.appendChild(tr);
+      });
+    }
+    table.appendChild(tbody); tw.appendChild(table); panel.appendChild(tw); wrap.appendChild(panel);
+
+    setTimeout(() => {
+      document.getElementById("addTeacherBtn").onclick = () => openTeacherForm();
+      document.getElementById("teacherSearch").oninput = (e) => { teacherSearch = e.target.value; render(); };
+      wrap.querySelectorAll("[data-edit]").forEach(b => b.onclick = () => openTeacherForm(b.dataset.edit));
+      wrap.querySelectorAll("[data-del]").forEach(b => b.onclick = () => deleteTeacher(b.dataset.del));
+    }, 0);
+
+    return wrap;
+  }
+
+  function openTeacherForm(id) {
+    const existing = id ? data.teachers.find(t => t.id === id) : null;
+    openModal(`
+      <h3>${existing ? "Edit teacher" : "Add teacher"}</h3>
+      <form id="teacherForm" novalidate>
+        <div class="field" data-f="name"><label>Full name *</label><input type="text" name="name" value="${escapeHtml(existing?.name)}"><div class="err">Name is required.</div></div>
+        <div class="field" data-f="subject"><label>Subject *</label><input type="text" name="subject" value="${escapeHtml(existing?.subject)}"><div class="err">Subject is required.</div></div>
+        <div class="field" data-f="email"><label>Email</label><input type="email" name="email" value="${escapeHtml(existing?.email)}"><div class="err">Enter a valid email address.</div></div>
+        <div class="field" data-f="phone"><label>Phone</label><input type="tel" name="phone" value="${escapeHtml(existing?.phone)}"></div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-ghost" id="cancelBtn">Cancel</button>
+          <button type="submit" class="btn btn-primary">${existing ? "Save changes" : "Add teacher"}</button>
+        </div>
+      </form>
+    `);
+    document.getElementById("cancelBtn").onclick = closeModal;
+    document.getElementById("teacherForm").onsubmit = (e) => {
+      e.preventDefault();
+      const f = e.target;
+      const name = f.name.value.trim();
+      const subject = f.subject.value.trim();
+      const email = f.email.value.trim();
+      let ok = true;
+      clearErrors(f);
+      if (!name) { markInvalid(f, "name"); ok = false; }
+      if (!subject) { markInvalid(f, "subject"); ok = false; }
+      if (email && !validEmail(email)) { markInvalid(f, "email"); ok = false; }
+      if (!ok) return;
+      const record = { id: existing ? existing.id : genId(), name, subject, email, phone: f.phone.value.trim() };
+      if (existing) { Object.assign(existing, record); showToast("Teacher updated."); }
+      else { data.teachers.push(record); showToast("Teacher added."); }
+      saveData(); closeModal(); render();
+    };
+  }
+
+  function deleteTeacher(id) {
+    const t = data.teachers.find(x => x.id === id);
+    if (!t) return;
+    const assigned = data.classes.filter(c => c.teacherId === id);
+    if (assigned.length) {
+      if (!confirm(`${t.name} is assigned to ${assigned.length} class(es). Delete anyway and unassign?`)) return;
+      assigned.forEach(c => c.teacherId = null);
+    } else if (!confirm(`Delete ${t.name}?`)) return;
+    data.teachers = data.teachers.filter(x => x.id !== id);
+    saveData(); showToast("Teacher deleted."); render();
+  }
+
+  // ---------------------------------------------------------------
+  // CLASSES
+  // ---------------------------------------------------------------
+  function renderClasses() {
+    const wrap = el("div");
+    wrap.appendChild(pageHead("Classes", "Manage class sections and room assignments.", `<button class="btn btn-gold" id="addClassBtn">+ Add class</button>`));
+
+    const panel = el("div", "panel");
+    const tw = el("div", "table-wrap");
+    const table = el("table");
+    table.innerHTML = `<thead><tr><th>Class</th><th>Class teacher</th><th>Room</th><th>Capacity</th><th>Enrolled</th><th></th></tr></thead>`;
+    const tbody = el("tbody");
+    if (data.classes.length === 0) {
+      tbody.innerHTML = `<tr class="empty-row"><td colspan="6">No classes yet.</td></tr>`;
+    } else {
+      data.classes.forEach(c => {
+        const teacher = data.teachers.find(t => t.id === c.teacherId);
+        const enrolled = data.students.filter(s => s.cls === c.name).length;
+        const tr = el("tr");
+        tr.innerHTML = `
+          <td>${escapeHtml(c.name)}</td>
+          <td>${teacher ? escapeHtml(teacher.name) : "— Unassigned —"}</td>
+          <td>${escapeHtml(c.room || "—")}</td>
+          <td>${c.capacity ?? "—"}</td>
+          <td>${enrolled}</td>
+          <td style="white-space:nowrap;">
+            <button class="btn-edit-text" data-edit="${c.id}">Edit</button>
+            <button class="btn-danger-text" data-del="${c.id}">Delete</button>
+          </td>`;
+        tbody.appendChild(tr);
+      });
+    }
+    table.appendChild(tbody); tw.appendChild(table); panel.appendChild(tw); wrap.appendChild(panel);
+
+    setTimeout(() => {
+      document.getElementById("addClassBtn").onclick = () => openClassForm();
+      wrap.querySelectorAll("[data-edit]").forEach(b => b.onclick = () => openClassForm(b.dataset.edit));
+      wrap.querySelectorAll("[data-del]").forEach(b => b.onclick = () => deleteClass(b.dataset.del));
+    }, 0);
+
+    return wrap;
+  }
+
+  function openClassForm(id) {
+    const existing = id ? data.classes.find(c => c.id === id) : null;
+    const teacherOptions = data.teachers.map(t => `<option value="${t.id}" ${existing && existing.teacherId === t.id ? "selected" : ""}>${escapeHtml(t.name)}</option>`).join("");
+    openModal(`
+      <h3>${existing ? "Edit class" : "Add class"}</h3>
+      <form id="classForm" novalidate>
+        <div class="field" data-f="name"><label>Class name *</label><input type="text" name="name" placeholder="e.g. Grade 7 - C" value="${escapeHtml(existing?.name)}"><div class="err">Class name is required and must be unique.</div></div>
+        <div class="field" data-f="teacherId"><label>Class teacher</label><select name="teacherId"><option value="">— Unassigned —</option>${teacherOptions}</select></div>
+        <div class="field" data-f="room"><label>Room</label><input type="text" name="room" value="${escapeHtml(existing?.room)}"></div>
+        <div class="field" data-f="capacity"><label>Capacity</label><input type="number" min="1" name="capacity" value="${existing?.capacity ?? ""}"><div class="err">Capacity must be a positive number.</div></div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-ghost" id="cancelBtn">Cancel</button>
+          <button type="submit" class="btn btn-primary">${existing ? "Save changes" : "Add class"}</button>
+        </div>
+      </form>
+    `);
+    document.getElementById("cancelBtn").onclick = closeModal;
+    document.getElementById("classForm").onsubmit = (e) => {
+      e.preventDefault();
+      const f = e.target;
+      const name = f.name.value.trim();
+      const capVal = f.capacity.value;
+      let ok = true;
+      clearErrors(f);
+      if (!name) { markInvalid(f, "name"); ok = false; }
+      const dup = data.classes.find(c => c.name.toLowerCase() === name.toLowerCase() && (!existing || c.id !== existing.id));
+      if (name && dup) { markInvalid(f, "name"); ok = false; }
+      if (capVal && (isNaN(capVal) || Number(capVal) <= 0)) { markInvalid(f, "capacity"); ok = false; }
+      if (!ok) return;
+      const oldName = existing ? existing.name : null;
+      const record = { id: existing ? existing.id : genId(), name, teacherId: f.teacherId.value || null, room: f.room.value.trim(), capacity: capVal ? Number(capVal) : null };
+      if (existing) {
+        Object.assign(existing, record);
+        if (oldName && oldName !== name) data.students.forEach(s => { if (s.cls === oldName) s.cls = name; });
+        showToast("Class updated.");
+      } else { data.classes.push(record); showToast("Class added."); }
+      saveData(); closeModal(); render();
+    };
+  }
+
+  function deleteClass(id) {
+    const c = data.classes.find(x => x.id === id);
+    if (!c) return;
+    const enrolled = data.students.filter(s => s.cls === c.name).length;
+    if (enrolled && !confirm(`${enrolled} student(s) are in ${c.name}. Delete the class anyway? Their class field will be cleared.`)) return;
+    if (!enrolled && !confirm(`Delete ${c.name}?`)) return;
+    data.students.forEach(s => { if (s.cls === c.name) s.cls = ""; });
+    data.classes = data.classes.filter(x => x.id !== id);
+    saveData(); showToast("Class deleted."); render();
+  }
+
+  // ---------------------------------------------------------------
+  // ATTENDANCE
+  // ---------------------------------------------------------------
+  let attClass = data.classes[0] ? data.classes[0].name : "";
+  let attDate = todayStr();
+
+  function attKey(cls, date) { return cls + "|" + date; }
+
+  function renderAttendance() {
+    const wrap = el("div");
+    wrap.appendChild(pageHead("Attendance", "Take attendance for a class on a given day."));
+
+    const panel = el("div", "panel");
+    const classOptions = data.classes.map(c => `<option value="${escapeHtml(c.name)}" ${c.name === attClass ? "selected" : ""}>${escapeHtml(c.name)}</option>`).join("");
+    panel.innerHTML = `
+      <div class="toolbar">
+        <div class="toolbar-left">
+          <select id="attClassSel">${classOptions || `<option value="">No classes yet</option>`}</select>
+          <input type="date" id="attDateSel" value="${attDate}">
+        </div>
+      </div>`;
+
+    const roster = data.students.filter(s => s.cls === attClass);
+    const key = attKey(attClass, attDate);
+    const record = data.attendance[key] || {};
+
+    const listWrap = el("div", "attendance-list");
+    if (!attClass) {
+      listWrap.innerHTML = `<p class="hint">Add a class first from the Classes tab.</p>`;
+    } else if (roster.length === 0) {
+      listWrap.innerHTML = `<p class="hint">No students are enrolled in ${escapeHtml(attClass)} yet.</p>`;
+    } else {
+      roster.forEach(s => {
+        const status = record[s.id] || "unmarked";
+        const row = el("div", "att-row");
+        row.innerHTML = `
+          <div class="name">${escapeHtml(s.name)} <span class="hint">· ${escapeHtml(s.roll)}</span></div>
+          <div class="att-toggle">
+            <button class="${status === 'present' ? 'on-present' : ''}" data-id="${s.id}" data-status="present">Present</button>
+            <button class="${status === 'absent' ? 'on-absent' : ''}" data-id="${s.id}" data-status="absent">Absent</button>
+          </div>`;
+        listWrap.appendChild(row);
+      });
+    }
+    panel.appendChild(listWrap);
+
+    if (roster.length) {
+      const summary = el("p", "hint");
+      const presentCount = roster.filter(s => record[s.id] === "present").length;
+      const absentCount = roster.filter(s => record[s.id] === "absent").length;
+      summary.style.marginTop = "16px";
+      summary.textContent = `${presentCount} present · ${absentCount} absent · ${roster.length - presentCount - absentCount} unmarked`;
+      panel.appendChild(summary);
+    }
+
+    wrap.appendChild(panel);
+
+    setTimeout(() => {
+      const sel = document.getElementById("attClassSel");
+      const dateSel = document.getElementById("attDateSel");
+      if (sel) sel.onchange = (e) => { attClass = e.target.value; render(); };
+      if (dateSel) dateSel.onchange = (e) => { attDate = e.target.value; render(); };
+      wrap.querySelectorAll(".att-toggle button").forEach(btn => {
+        btn.onclick = () => {
+          const id = btn.dataset.id, status = btn.dataset.status;
+          const k = attKey(attClass, attDate);
+          if (!data.attendance[k]) data.attendance[k] = {};
+          data.attendance[k][id] = data.attendance[k][id] === status ? undefined : status;
+          if (data.attendance[k][id] === undefined) delete data.attendance[k][id];
+          saveData();
+          render();
+        };
+      });
+    }, 0);
+
+    return wrap;
+  }
+
+  // ---------------------------------------------------------------
+  // FEES
+  // ---------------------------------------------------------------
+  let feeFilter = "all";
+
+  function renderFees() {
+    const wrap = el("div");
+    wrap.appendChild(pageHead("Fees", "Track fee payments per student.", `<button class="btn btn-gold" id="addFeeBtn">+ Add fee record</button>`));
+
+    const panel = el("div", "panel");
+    const toolbar = el("div", "toolbar");
+    toolbar.innerHTML = `
+      <div class="toolbar-left">
+        <select id="feeFilterSel">
+          <option value="all" ${feeFilter === "all" ? "selected" : ""}>All records</option>
+          <option value="due" ${feeFilter === "due" ? "selected" : ""}>Due only</option>
+          <option value="paid" ${feeFilter === "paid" ? "selected" : ""}>Paid only</option>
+        </select>
+      </div>
+      <div class="hint">${data.fees.length} total</div>`;
+    panel.appendChild(toolbar);
+
+    const filtered = data.fees.filter(f => feeFilter === "all" || f.status === feeFilter);
+
+    const tw = el("div", "table-wrap");
+    const table = el("table");
+    table.innerHTML = `<thead><tr><th>Student</th><th>Note</th><th>Amount</th><th>Date</th><th>Status</th><th></th></tr></thead>`;
+    const tbody = el("tbody");
+    if (filtered.length === 0) {
+      tbody.innerHTML = `<tr class="empty-row"><td colspan="6">No matching fee records.</td></tr>`;
+    } else {
+      filtered.forEach(f => {
+        const student = data.students.find(s => s.id === f.studentId);
+        const tr = el("tr");
+        tr.innerHTML = `
+          <td>${student ? escapeHtml(student.name) : "— Deleted student —"}</td>
+          <td>${escapeHtml(f.note || "—")}</td>
+          <td>₹${Number(f.amount).toLocaleString()}</td>
+          <td>${escapeHtml(f.date)}</td>
+          <td><span class="badge ${f.status === 'paid' ? 'badge-paid' : 'badge-due'}">${f.status}</span></td>
+          <td style="white-space:nowrap;">
+            <button class="btn-edit-text" data-toggle="${f.id}">${f.status === 'paid' ? 'Mark due' : 'Mark paid'}</button>
+            <button class="btn-edit-text" data-edit="${f.id}">Edit</button>
+            <button class="btn-danger-text" data-del="${f.id}">Delete</button>
+          </td>`;
+        tbody.appendChild(tr);
+      });
+    }
+    table.appendChild(tbody); tw.appendChild(table); panel.appendChild(tw); wrap.appendChild(panel);
+
+    setTimeout(() => {
+      document.getElementById("addFeeBtn").onclick = () => openFeeForm();
+      document.getElementById("feeFilterSel").onchange = (e) => { feeFilter = e.target.value; render(); };
+      wrap.querySelectorAll("[data-edit]").forEach(b => b.onclick = () => openFeeForm(b.dataset.edit));
+      wrap.querySelectorAll("[data-del]").forEach(b => b.onclick = () => deleteFee(b.dataset.del));
+      wrap.querySelectorAll("[data-toggle]").forEach(b => b.onclick = () => toggleFee(b.dataset.toggle));
+    }, 0);
+
+    return wrap;
+  }
+
+  function toggleFee(id) {
+    const f = data.fees.find(x => x.id === id);
+    if (!f) return;
+    f.status = f.status === "paid" ? "due" : "paid";
+    saveData(); showToast(`Marked as ${f.status}.`); render();
+  }
+
+  function openFeeForm(id) {
+    const existing = id ? data.fees.find(f => f.id === id) : null;
+    const studentOptions = data.students.map(s => `<option value="${s.id}" ${existing && existing.studentId === s.id ? "selected" : ""}>${escapeHtml(s.name)} (${escapeHtml(s.roll)})</option>`).join("");
+    openModal(`
+      <h3>${existing ? "Edit fee record" : "Add fee record"}</h3>
+      <form id="feeForm" novalidate>
+        <div class="field" data-f="studentId"><label>Student *</label><select name="studentId"><option value="">— Select —</option>${studentOptions}</select><div class="err">Choose a student.</div></div>
+        <div class="field" data-f="note"><label>Note</label><input type="text" name="note" placeholder="e.g. Term 1 tuition" value="${escapeHtml(existing?.note)}"></div>
+        <div class="field" data-f="amount"><label>Amount (₹) *</label><input type="number" min="0" name="amount" value="${existing?.amount ?? ""}"><div class="err">Enter a valid amount.</div></div>
+        <div class="field" data-f="date"><label>Date *</label><input type="date" name="date" value="${existing?.date || todayStr()}"></div>
+        <div class="field" data-f="status"><label>Status</label>
+          <select name="status">
+            <option value="due" ${(!existing || existing.status === "due") ? "selected" : ""}>Due</option>
+            <option value="paid" ${existing?.status === "paid" ? "selected" : ""}>Paid</option>
+          </select>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-ghost" id="cancelBtn">Cancel</button>
+          <button type="submit" class="btn btn-primary">${existing ? "Save changes" : "Add record"}</button>
+        </div>
+      </form>
+    `);
+    document.getElementById("cancelBtn").onclick = closeModal;
+    document.getElementById("feeForm").onsubmit = (e) => {
+      e.preventDefault();
+      const f = e.target;
+      const studentId = f.studentId.value;
+      const amount = f.amount.value;
+      let ok = true;
+      clearErrors(f);
+      if (!studentId) { markInvalid(f, "studentId"); ok = false; }
+      if (!amount || isNaN(amount) || Number(amount) < 0) { markInvalid(f, "amount"); ok = false; }
+      if (!ok) return;
+      const record = { id: existing ? existing.id : genId(), studentId, note: f.note.value.trim(), amount: Number(amount), date: f.date.value || todayStr(), status: f.status.value };
+      if (existing) { Object.assign(existing, record); showToast("Fee record updated."); }
+      else { data.fees.push(record); showToast("Fee record added."); }
+      saveData(); closeModal(); render();
+    };
+  }
+
+  function deleteFee(id) {
+    if (!confirm("Delete this fee record?")) return;
+    data.fees = data.fees.filter(x => x.id !== id);
+    saveData(); showToast("Fee record deleted."); render();
+  }
+
+  // ---------------------------------------------------------------
+  // INIT
+  // ---------------------------------------------------------------
+  render();
+})();
+</script>
+</body>
+</html>
